@@ -1,29 +1,24 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
+import Preloader from "./PreLoader";
+import GetUserInfo from "./GetUserInfo";
 
 const Dashboard = () => {
-    const[role,setRole] = useState(<></>);
+  const { getInfo, baseURL } = GetUserInfo();
+  const [role, setRole] = useState(<></>);
 
+  useEffect(() => {
+    if (getInfo !== undefined) {
+      if (getInfo.role === "admin") {
+        setRole(<>Admin</>);
+      } else if (getInfo.role === "donor") {
+        setRole(<>Donor</>);
+      } else if (getInfo.role === "patient") {
+        setRole(<>patient</>);
+      }
+    }
+  }, [getInfo]);
 
-    useEffect(() => {
-        let checkrole = localStorage.getItem("role");
-        if(checkrole==="admin"){
-            setRole(<>Admin</>)
-        }
-        else if(checkrole==="donor"){
-            setRole(<>Donor</>)
-        }
-        else if(checkrole==='patient'){
-            setRole(<>patient</>)
-        }
-    }, []);
+  return <>{!getInfo ? <Preloader /> : <div>{role}</div>}</>;
+};
 
-
-    return (
-        <div>
-            This is Dashboard
-            <p>{role}</p>
-        </div>
-    )
-}
-
-export default Dashboard
+export default Dashboard;

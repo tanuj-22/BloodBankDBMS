@@ -45,7 +45,7 @@ const NavbarmuiLoggedIn = () => {
           <div className={classes.btn}>
               
             <Button color="inherit">
-              <Link className={classes.lnk} to="/">
+              <Link className={classes.lnk} to="/logout">
               &nbsp;Logout <i className="fas fa-sign-out-alt" /> 
               </Link>
             </Button>
