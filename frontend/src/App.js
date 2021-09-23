@@ -1,6 +1,7 @@
 import "./App.css";
 import "./index.css";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import Login from "./components/SignInPageComponents/Login";
 import Logout from "./components/Logout";
 import Navbar from "./components/Navbarmui";
 import Home from "./components/Home";
@@ -8,10 +9,24 @@ import NavbarLoggedIn from "./components/NavbarmuiLoggedIn";
 import Footer from "./components/Footer";
 import AdminLogin from "./components/AdminLogin";
 import Dashboard from "./components/Dashboard";
+import DonorSignup from "./components/DonorSignUpPageComponents/Signup";
+import PatientSignup from "./components/PatientSignUpPageComponents/Signup";
 import RoleBasedRoute from "./components/RoleBasedRoute";
+import { createTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
+import UpdateAndGetStock from "./components/views/AdminView/UpdateAndGetStock";
+import AdminDonorView from "./components/views/AdminView/AdminDonorView";
+import AdminPatientView from "./components/views/AdminView/AdminPatientView";
+import AdminDonationView from "./components/views/AdminView/AdminDonationView";
+
+const themea = createTheme({
+ 
+ 
+});
 
 function App() {
   return (
+    <ThemeProvider theme={themea}>
     <div className="App">
       <div className="App">
         <Router>
@@ -33,17 +48,18 @@ function App() {
               <Dashboard />
             </Route>
             <Route exact path="/logout" component={Logout} />
-            {/*<Route exact path="/login" component={Login} />
-          <Route exact path="/logout" component={Logout}/>
-          <Route exact path="/signup" component={Signup} />
-          <Route exact path="/About" component={About}/> */}
+            <Route exact path="/login" ><Navbar /><Login/></Route>
+            <Route exact path="/donor-signup" ><Navbar /><DonorSignup/></Route>
+            <Route exact path="/patient-signup" ><Navbar /><PatientSignup/></Route>
+
+            {/* <Route exact path="/signup" component={Signup} /> */}
 
             <RoleBasedRoute
-              exact
+              exact 
               path="/admin-donor-view"
               role="admin"
               component={() => {
-                return <>admin-donor-view</>; 
+                return <><AdminDonorView/></>;
               }}
             />
             <RoleBasedRoute
@@ -51,7 +67,7 @@ function App() {
               path="/admin-patient-view"
               role="admin"
               component={() => {
-                return <>admin-patient-view</>; 
+                return <><AdminPatientView/></>;
               }}
             />
             <RoleBasedRoute
@@ -59,7 +75,7 @@ function App() {
               path="/admin-donations-view"
               role="admin"
               component={() => {
-                return <>admin-donations-view</>; 
+                return <><AdminDonationView/></>;
               }}
             />
             <RoleBasedRoute
@@ -67,7 +83,7 @@ function App() {
               path="/admin-bloodrequests-view"
               role="admin"
               component={() => {
-                return <>admin-bloodrequests-view</>; 
+                return <>admin-bloodrequests-view</>;
               }}
             />
             <RoleBasedRoute
@@ -75,7 +91,7 @@ function App() {
               path="/admin-requesthistory-view"
               role="admin"
               component={() => {
-                return <>admin-requesthistory-view</>; 
+                return <>admin-requesthistory-view</>;
               }}
             />
             <RoleBasedRoute
@@ -83,15 +99,7 @@ function App() {
               path="/admin-bloodstockupdate-view"
               role="admin"
               component={() => {
-                return <>admin-bloodstockupdate-view</>; 
-              }}
-            />
-            <RoleBasedRoute
-              exact
-              path="/admin-bloodstockupdate-view"
-              role="donor"
-              component={() => {
-                return <>admin-bloodstockupdate-view</>; 
+                return <><UpdateAndGetStock/></>;
               }}
             />
             <RoleBasedRoute
@@ -99,7 +107,7 @@ function App() {
               path="/donor-donateblood-view"
               role="donor"
               component={() => {
-                return <>donor-donateblood-view</>; 
+                return <>donor-donateblood-view</>;
               }}
             />
             <RoleBasedRoute
@@ -107,7 +115,7 @@ function App() {
               path="/donor-donationhistory-view"
               role="donor"
               component={() => {
-                return <>donor-donationhistory-view</>; 
+                return <>donor-donationhistory-view</>;
               }}
             />
             <RoleBasedRoute
@@ -115,7 +123,7 @@ function App() {
               path="/patient-makebloodrequests-view"
               role="patient"
               component={() => {
-                return <>patient-makebloodrequests-view</>; 
+                return <>patient-makebloodrequests-view</>;
               }}
             />
             <RoleBasedRoute
@@ -123,14 +131,14 @@ function App() {
               path="/patient-requesthistory-view"
               role="patient"
               component={() => {
-                return <>patient-requesthistory-view</>; 
+                return <>patient-requesthistory-view</>;
               }}
             />
-
           </Switch>
         </Router>
       </div>
     </div>
+    </ThemeProvider>
   );
 }
 

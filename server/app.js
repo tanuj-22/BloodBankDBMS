@@ -26,6 +26,114 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// sign in
+
+app.post('/login',(req,res)=>{
+  console.log(req.body);
+  let sql = `CALL check_user('${req.body.username}', '${req.body.password}', @status)`;
+  let query = db.query(sql,(err,result)=>{
+    if (err){
+      console.log(err);
+      
+    }
+    
+    result = result[0][0];
+    //console.log(result);
+    if(result["status_code"] === 404){
+      
+      res.status(404).json({msg:"User does not exist"});
+    }else if(result["status_code"] === 401){
+    
+      res.status(401).json({msg:"Password Incorrect"});
+    }else if(result["status_code"] === 201){
+      res.status(201).json({msg:"user logged in"});
+    }
+  })
+
+
+});
+
+app.post('/patient-signup',(req,res)=>{
+  //console.log(req.body);
+  let user = {
+    userID : req.body.username,
+    password : req.body.password,
+    fname: req.body.firstname,
+    lname: req.body.lastname,
+    mobile_no: req.body.phone,
+    age: req.body.age,
+    gender: req.body.gender,
+    address: req.body.primaryAddress.slice(0,16),
+    blood_group: req.body.blood_group,
+    aadhar_no: req.body.Aadhar_no,
+    disease : "NA"
+  }
+  let sql = `select userID from usertable where userID = '${user.userID}'`;
+  let sql1 = `call insert_into_table('${user.userID}','${user.fname}','${user.lname}','${user.mobile_no}','${user.password}',${user.age},'${user.gender}','${user.address}','${user.blood_group}','${user.aadhar_no}','${user.disease}','patient');`;
+  let query = db.query(sql,(err,result)=>{
+    if (err){
+      console.log(err);
+      
+    }
+    if(result.length ===0){
+      //console.log("all set for inserting the record");
+      let query1 = db.query(sql1,(err,result1)=>{
+        if (err){
+          console.log(err); 
+        }
+        console.log("patient created with row ");
+        res.status(201).json({msg:"user registered successfully"});
+      })
+    }else{
+      res.status(409).json({msg:"username not available"});
+    }
+    
+  });
+
+});
+
+app.post('/donor-signup',(req,res)=>{
+  //console.log(req.body);
+  let user = {
+    userID : req.body.username,
+    password : req.body.password,
+    fname: req.body.firstname,
+    lname: req.body.lastname,
+    mobile_no: req.body.phone,
+    age: req.body.age,
+    gender: req.body.gender,
+    address: req.body.primaryAddress.slice(0,16),
+    blood_group: req.body.blood_group,
+    aadhar_no: req.body.Aadhar_no,
+    disease : req.body.disease
+  }
+  let sql = `select userID from usertable where userID = '${user.userID}'`;
+  let sql1 = `call insert_into_table('${user.userID}','${user.fname}','${user.lname}','${user.mobile_no}','${user.password}',${user.age},'${user.gender}','${user.address}','${user.blood_group}','${user.aadhar_no}','${user.disease}','donor');`;
+  let query = db.query(sql,(err,result)=>{
+    if (err){
+      console.log(err);
+      
+    }
+    if(result.length ===0){
+      console.log("all set for inserting the record");
+      let query1 = db.query(sql1,(err,result)=>{
+        if (err){
+          console.log(err); 
+        }
+        console.log("donor created with rowpacket ");
+        res.status(201).json({msg:"user registered successfully"});
+      })
+    }else{
+      res.status(409).json({msg:"username not available"});
+    }
+    
+  });
+
+
+});
+
+
+
 app.post('/getUserInfo',(req,res)=>{
   
   console.log(req.body);
@@ -34,20 +142,163 @@ app.post('/getUserInfo',(req,res)=>{
   let query = db.query(sql,(err,result)=>{
     if (err){
       console.log(err);
-      res.send("User does not exist");
-      res.status(404);
+      
     }
     console.log(result);
     result = result[0][0];
-    res.send({role : result["role"],roleID : result["ID"]});
-    res.status(200);
-
+    if(result["role"] === null){
+      
+      res.status(404).json({msg:"User does not exist"});
+    }else{
+    
+    res.status(200).json({role : result["role"],roleID : result["ID"]});
+    }
   })
 
 });
 
 
+//get blood stock
 
+app.get("/getStock", (req, res) => {
+  //console.log(req.body);
+
+  let sql = "select * from stock";
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    let stock={};
+    //console.log(result[1]["blood_group"]);
+    for(let i=0;i<result.length;i++){
+      stock[result[i]["blood_group"]] = result[i]["blood_unit"];
+    }
+    //console.log(stock);
+    res.status(200).json(stock);
+    
+    
+  }); 
+});
+
+//update blood stock
+
+app.post("/updateStock", (req, res) => {
+  console.log(req.body);
+
+ 
+
+  let sql = `update stock set blood_unit = ${req.body.unit} where blood_group = '${req.body.bloodgrp}'`;
+  //console.log(sql);
+
+  db.query(sql,(err,result)=>{
+      if(err) console.log(err);
+      //console.log(result);
+      res.send('value updated....');
+  })
+});
+
+
+//get Stats
+
+app.get("/getStats", (req, res) => {
+  //console.log(req.body);
+
+  let sql = "CALL getStats()";
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    //console.log(result[0][0]);
+    res.status(200).json(result[0][0]);
+    
+    
+  });  
+});
+
+
+app.get("/getDonors", (req, res) => {
+  //console.log(req.body);
+
+  let sql = "SELECT * from donor";
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result);
+    res.status(200).json(result);
+    
+    
+  });  
+});
+
+app.get("/getPatients", (req, res) => {
+  //console.log(req.body);
+
+  let sql = "SELECT * from patient";
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result);
+    res.status(200).json(result);
+    
+    
+  });  
+});
+
+
+app.get("/getDonations", (req, res) => {
+  //console.log(req.body);
+
+  let sql = "SELECT fname,lname,donor.donorID,blood_group,age,disease,unit,date_of_donation,status from donor INNER join blood_donate ON donor.donorID = blood_donate.donorID;";
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result);
+    res.status(200).json(result);
+    
+    
+  });  
+});
+
+
+app.post("/deletebyadmin/", (req, res) => {
+  console.log(req.body);
+
+  let sql = `Delete from usertable where userID = '${req.body.userID}' `;
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result);
+    res.status(200).json(result);
+    
+    
+  });  
+});
+
+app.post("/approvedonationbyadmin", (req, res) => {
+  console.log(req.body);
+
+  let sql = `CALL approveDonation(${req.body.donorID},${req.body.unit}) `;
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result);
+    res.status(200).json(result);
+    
+    
+  });   
+});
+
+app.post("/rejectdonationbyadmin", (req, res) => {
+  console.log(req.body);
+
+  let sql = `UPDATE blood_donate set status = "rejected" WHERE donorID = ${req.body.donorID} `;
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result);
+    res.status(200).json(result);
+    
+    
+  });  
+});
 
 app.listen("3001", () => {
     console.log("Server started at port 3001");

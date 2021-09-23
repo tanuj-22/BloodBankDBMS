@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Preloader from "./PreLoader";
 import GetUserInfo from "./GetUserInfo";
-
+import Admin from "./Admin";
+import Donor from "./Donor";
+import Patient from "./Patient";
 const Dashboard = () => {
   const { getInfo, baseURL } = GetUserInfo();
   const [role, setRole] = useState(<></>);
@@ -9,11 +11,11 @@ const Dashboard = () => {
   useEffect(() => {
     if (getInfo !== undefined) {
       if (getInfo.role === "admin") {
-        setRole(<>Admin</>);
+        setRole(<><Admin/></>);
       } else if (getInfo.role === "donor") {
-        setRole(<>Donor</>);
+        setRole(<><Donor/></>);
       } else if (getInfo.role === "patient") {
-        setRole(<>patient</>);
+        setRole(<><Patient/></>);
       }
     }
   }, [getInfo]);

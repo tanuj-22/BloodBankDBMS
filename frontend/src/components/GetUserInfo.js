@@ -15,7 +15,7 @@ function GetUserInfo() {
     async function checkAuth(username) {
       //await axios.post('/getuserinfo',{token:token})
       await axios
-        .post("/getuserinfo", { username: username })
+        .post("/getUserInfo", { username: username })
         .then((res) => {
           if (res.status === 200) {
             //setisAuth(true);
