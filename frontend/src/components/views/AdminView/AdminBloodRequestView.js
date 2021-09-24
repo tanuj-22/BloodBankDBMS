@@ -1,34 +1,37 @@
 import axios from "../../axios";
 import React, { useEffect, useState } from "react";
 
-const AdminDonationView = () => {
-  const [donations, setDonations] = useState([]);
+const AdminBloodRequestView = () => {
+  const [bloodrequests, setBloodrequests] = useState([]);
   useEffect(() => {
     axios
-      .get("/getDonations")
+      .get("/getAllBloodRequest")
       .then((res) => {
         console.log(res.data);
-        setDonations(res.data);
+        setBloodrequests(res.data);
       })
       .catch((err) => console.log(err));
   }, []);
 
-  const handleApprove = (userID,unit,donationID) => {
+  const handleApprove = (userID,unit,requestID) => {
     console.log(userID);
     axios
-      .post("/approvedonationbyadmin", { donorID: userID,unit:unit,donationID:donationID })
+      .post("/approverequestbyadmin", { patientID: userID,unit:unit,requestID:requestID })
       .then((res) => {
-        if (res.status === 200) {
+        if (res.status === 201) {
           window.location.reload();
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {console.log(err);
+        if(err.response.status===409){
+            alert("Insufficient Stock");
+        }});
   }; 
 
-  const handleDeny = (userID,donationID) => {
+  const handleDeny = (userID,requestID) => {
     console.log(userID);
     axios
-      .post("/rejectdonationbyadmin", { donorID: userID,donationID:donationID })
+      .post("/rejectrequestbyadmin", { patientID: userID,requestID:requestID })
       .then((res) => {
         if (res.status === 200) {
           window.location.reload();
@@ -37,17 +40,17 @@ const AdminDonationView = () => {
       .catch((err) => console.log(err));
   };
 
-  const actionTab = (donation) => {
+  const actionTab = (bloodrequests) => {
     console.log("inside")
-  if (donation.status === "pending") {
+  if (bloodrequests.status === "pending") {
     return (
       <td className="text-right">
         <button
         onClick={(e)=>{
             e.preventDefault();
-            handleApprove(`${donation.donorID}`,donation.unit,donation.donationID);
+            handleApprove(`${bloodrequests.patientID}`,bloodrequests.unit,bloodrequests.requestID);
         }}
-        value={donation.donorID}
+        value={bloodrequests.patientID}
           className="btn btn-primary badge-pill"
           style={{ width: 100 }}
         >
@@ -61,9 +64,9 @@ const AdminDonationView = () => {
         <button 
         onClick={(e)=>{
             e.preventDefault();
-            handleDeny(`${donation.donorID}`,donation.donationID);
+            handleDeny(`${bloodrequests.patientID}`,bloodrequests.requestID);
         }}
-        value={donation.donorID}
+        value={bloodrequests.patientID}
           className="btn btn-danger badge-pill"
           style={{ width: 80 }}
         >
@@ -76,40 +79,42 @@ const AdminDonationView = () => {
         </button>
       </td>
     );
-  } else if (donation.status === "approved") {
-      return (
-        <td>
-          <span className="label warning">
-            {donation.unit} Unit Added To Stock
-          </span>
-        </td>
-      );
-    } else if (donation.status === "rejected") {
-      return (
-        <td>
-          <span className="label danger">0 Unit Added To Stock</span>
-        </td>
-      );
-    }
-    else{
-        return <>Problem</>
-    }
+  } 
+//   else if (bloodrequests.status === "approved") {
+//       return (
+//         <td>
+//           <span className="label warning">
+//             {bloodrequests.unit} Unit Deducted from Stock
+//           </span>
+//         </td>
+//       );
+//     } else if (bloodrequests.status === "rejected") {
+//       return (
+//         <td>
+//           <span className="label danger">0 Unit Deducted from Stock</span>
+//         </td>
+//       );
+//     }
+//     else{
+//         return <>Problem</>
+//     }
 }
-  const DonationTab = donations.map((donation) => {
+  const AllRequestTab = bloodrequests.map((bloodrequests) => {
+      if(bloodrequests.status ==='pending'){
     return (
       <tbody>
         <tr>
-          <td>{donation.fname + " " + donation.lname}</td>
-          <td>{donation.disease}</td>
-          <td>{donation.age}</td>
-          <td>{donation.blood_group}</td>
-          <td>{donation.unit}</td>
-          <td>{`${donation.date_of_donation}`.slice(0, 10)}</td>
-          <td>{donation.status}</td>
-          {actionTab(donation)}
+          <td>{bloodrequests.fname + " " + bloodrequests.lname}</td>
+          <td>{bloodrequests.reason}</td>
+          <td>{bloodrequests.age}</td>
+          <td>{bloodrequests.blood_group}</td>
+          <td>{bloodrequests.unit}</td>
+          <td>{`${bloodrequests.date_of_request}`.slice(0, 10)}</td>
+          <td>{bloodrequests.status}</td>
+          {actionTab(bloodrequests)}
         </tr>
       </tbody>
-    );
+    );}
   });
 
   return (
@@ -123,14 +128,14 @@ const AdminDonationView = () => {
       <br />
       <br />
       <div className="container">
-        <h4 className="text-center">BLOOD DONATION DETAILS</h4>
+        <h4 className="text-center">BLOOD REQUESTED</h4>
         <br />
 
         <table className="table table-light table-hover table-bordered table-striped">
           <thead className="bg-info">
             <tr>
-              <th scope="col">Donor Name</th>
-              <th scope="col">Disease</th>
+              <th scope="col">Patient Name</th>
+              <th scope="col">Reason</th>
               <th scope="col">Age</th>
               <th scope="col">Blood Group</th>
               <th scope="col">Unit</th>
@@ -139,11 +144,11 @@ const AdminDonationView = () => {
               <th className="text-right">Action</th>
             </tr>
           </thead>
-          {DonationTab}
+          {AllRequestTab}
         </table>
       </div>
     </>
   );
 };
 
-export default AdminDonationView;
+export default AdminBloodRequestView;

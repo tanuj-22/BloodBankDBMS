@@ -246,7 +246,7 @@ app.get("/getPatients", (req, res) => {
 app.get("/getDonations", (req, res) => {
   //console.log(req.body);
 
-  let sql = "SELECT fname,lname,donor.donorID,blood_group,age,disease,unit,date_of_donation,status from donor INNER join blood_donate ON donor.donorID = blood_donate.donorID;";
+  let sql = "SELECT fname,lname,donor.donorID,blood_group,age,disease,unit,donationID,date_of_donation,status from donor INNER join blood_donate ON donor.donorID = blood_donate.donorID;";
 
   let query = db.query(sql, (err, result) => {
     if (err) throw err;
@@ -255,7 +255,7 @@ app.get("/getDonations", (req, res) => {
     
     
   });  
-});
+}); 
 
 
 app.post("/deletebyadmin/", (req, res) => {
@@ -275,7 +275,7 @@ app.post("/deletebyadmin/", (req, res) => {
 app.post("/approvedonationbyadmin", (req, res) => {
   console.log(req.body);
 
-  let sql = `CALL approveDonation(${req.body.donorID},${req.body.unit}) `;
+  let sql = `CALL approveDonation(${req.body.donorID},${req.body.unit},${req.body.donationID}) `;
 
   let query = db.query(sql, (err, result) => {
     if (err) throw err;
@@ -283,13 +283,13 @@ app.post("/approvedonationbyadmin", (req, res) => {
     res.status(200).json(result);
     
     
-  });   
+  });    
 });
 
 app.post("/rejectdonationbyadmin", (req, res) => {
   console.log(req.body);
 
-  let sql = `UPDATE blood_donate set status = "rejected" WHERE donorID = ${req.body.donorID} `;
+  let sql = `UPDATE blood_donate set status = "rejected" WHERE donationID = ${req.body.donationID} `;
 
   let query = db.query(sql, (err, result) => {
     if (err) throw err;
@@ -299,6 +299,74 @@ app.post("/rejectdonationbyadmin", (req, res) => {
     
   });  
 });
+
+
+app.get("/getAllBloodRequest", (req, res) => {
+  //console.log(req.body);
+
+  let sql = "SELECT fname,lname,patient.patientID,blood_group,age,unit,requestID,reason,doctor,date_of_request,status from patient INNER join bloodrequest ON patient.patientID = bloodrequest.patientID;";
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result);
+    res.status(200).json(result);
+    
+    
+  });  
+
+}); 
+
+
+app.post("/approverequestbyadmin", (req, res) => {
+  console.log(req.body);
+
+  let sql = `CALL approveRequest(${req.body.patientID},${req.body.unit},${req.body.requestID}) `;
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    //console.log(result[0][0].statusmsg);
+    if(result[0][0].statusmsg===201){
+      res.status(201).json({msg:"requested approved"});
+    }
+    else if(result[0][0].statusmsg===409){
+      res.status(409).json({msg:"request denied"});
+    }
+    
+     
+      
+  });    
+});
+
+app.post("/rejectrequestbyadmin", (req, res) => {
+  console.log(req.body);
+
+  let sql = `UPDATE bloodrequest set status = "rejected" WHERE requestID = ${req.body.requestID} `;
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result);
+    res.status(200).json(result);
+    
+    
+  });  
+});
+
+app.get("/getAllBloodRequestHistory", (req, res) => {
+  //console.log(req.body);
+
+  let sql = "call get_patientrequest_history();";
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result[0]);
+    res.status(200).json(result[0]);
+    
+    
+  });  
+
+}); 
+
+
 
 app.listen("3001", () => {
     console.log("Server started at port 3001");

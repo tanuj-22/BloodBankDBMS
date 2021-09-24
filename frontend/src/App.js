@@ -18,6 +18,8 @@ import UpdateAndGetStock from "./components/views/AdminView/UpdateAndGetStock";
 import AdminDonorView from "./components/views/AdminView/AdminDonorView";
 import AdminPatientView from "./components/views/AdminView/AdminPatientView";
 import AdminDonationView from "./components/views/AdminView/AdminDonationView";
+import AdminBloodRequestView from "./components/views/AdminView/AdminBloodRequestView";
+import AdminBloodRequestHistoryView from "./components/views/AdminView/AdminBloodRequestHistoryView";
 
 const themea = createTheme({
  
@@ -83,15 +85,15 @@ function App() {
               path="/admin-bloodrequests-view"
               role="admin"
               component={() => {
-                return <>admin-bloodrequests-view</>;
+                return <><AdminBloodRequestView/></>;
               }}
-            />
+            /> 
             <RoleBasedRoute
               exact
               path="/admin-requesthistory-view"
               role="admin"
               component={() => {
-                return <>admin-requesthistory-view</>;
+                return <><AdminBloodRequestHistoryView/></>;
               }}
             />
             <RoleBasedRoute
