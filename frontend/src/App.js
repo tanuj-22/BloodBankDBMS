@@ -20,6 +20,10 @@ import AdminPatientView from "./components/views/AdminView/AdminPatientView";
 import AdminDonationView from "./components/views/AdminView/AdminDonationView";
 import AdminBloodRequestView from "./components/views/AdminView/AdminBloodRequestView";
 import AdminBloodRequestHistoryView from "./components/views/AdminView/AdminBloodRequestHistoryView";
+import DonorDonateBlood from "./components/views/DonorView/DonorDonateBlood";
+import DonorDonationHistory from "./components/views/DonorView/DonorDonationHistory";
+import PatientRequestHistory from "./components/views/PatientView/PatientRequestHistory";
+import PatientMakeRequest from "./components/views/PatientView/PatientMakeRequest";
 
 const themea = createTheme({
  
@@ -109,7 +113,7 @@ function App() {
               path="/donor-donateblood-view"
               role="donor"
               component={() => {
-                return <>donor-donateblood-view</>;
+                return <><DonorDonateBlood/></>;
               }}
             />
             <RoleBasedRoute
@@ -117,7 +121,7 @@ function App() {
               path="/donor-donationhistory-view"
               role="donor"
               component={() => {
-                return <>donor-donationhistory-view</>;
+                return <><DonorDonationHistory/></>;
               }}
             />
             <RoleBasedRoute
@@ -125,7 +129,7 @@ function App() {
               path="/patient-makebloodrequests-view"
               role="patient"
               component={() => {
-                return <>patient-makebloodrequests-view</>;
+                return <><PatientMakeRequest/></>;
               }}
             />
             <RoleBasedRoute
@@ -133,7 +137,7 @@ function App() {
               path="/patient-requesthistory-view"
               role="patient"
               component={() => {
-                return <>patient-requesthistory-view</>;
+                return <><PatientRequestHistory/></>;
               }}
             />
           </Switch>

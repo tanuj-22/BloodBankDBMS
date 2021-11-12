@@ -367,6 +367,135 @@ app.get("/getAllBloodRequestHistory", (req, res) => {
 }); 
 
 
+// DONOR ROUTES
+
+app.get("/getDonorStat/:donorID", (req, res) => { 
+      
+  //console.log(req.params);
+
+  let sql = `CALL getDonorStats(${req.params.donorID})`;
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    //console.log(result[0][0]);
+    res.status(200).json(result[0][0]);
+    
+      
+  });  
+}); 
+ 
+app.post("/getDonorBloodGroup",(req,res)=>{
+  donorId = req.body.donorId;
+  console.log(req.body);
+  let sql = `select blood_group from donor where donorId =`+ donorId;
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result[0]);
+    res.status(200).json(result[0]);
+    
+    
+  })  
+  
+});
+
+
+app.post("/makeDonationRequest", (req, res) => { 
+      
+  
+  const unit = req.body.unit;
+  const donorID = parseInt(req.body.donorId);
+  
+  let sql = `CALL request_for_donation(${donorID},${unit})`;
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result[0]);
+    res.status(200).json(result[0]);
+  });  
+});
+
+app.get("/getDonorDonationsHistory/:donorID", (req, res) => { 
+      
+  console.log(req.params);
+
+  let sql = "SELECT donor.donorID,unit,donationID,date_of_donation,status from donor INNER join blood_donate ON donor.donorID = blood_donate.donorID where donor.donorID = "+req.params.donorID; 
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result);
+    res.status(200).json(result);
+    
+    
+  });   
+});
+
+// Patient ROUTES
+
+app.get("/getPatientStat/:PatientID", (req, res) => { 
+      
+  //console.log(req.params);
+
+  let sql = `CALL getPatientStats(${req.params.PatientID})`;
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    //console.log(result[0][0]);
+    res.status(200).json(result[0][0]);
+    
+      
+  });  
+});
+
+app.post("/getPatientBloodGroup",(req,res)=>{
+  patientID = req.body.patientID;
+  console.log(req.body);
+  let sql = `select blood_group from patient where patientID =`+ patientID;
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result[0]);
+    res.status(200).json(result[0]);
+    
+    
+  })  
+  
+});
+
+
+app.post("/makeBloodRequest", (req, res) => { 
+      
+  const unit = req.body.unit;
+  const patientID = parseInt(req.body.patientID);
+  const reason = req.body.reason;
+  const doctor = req.body.doctor;
+  let sql = `CALL request_for_blood(${patientID},${unit},'${reason}','${doctor}')`;
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result[0]);
+    res.status(200).json(result[0]);
+  });  
+});
+
+app.get("/getpatientsbloodrequestHistory/:patientID", (req, res) => { 
+      
+  
+  let sql = "SELECT patient.patientID,unit,requestID,doctor,reason,date_of_request,status from patient INNER join bloodrequest ON patient.patientID = bloodrequest.patientID where patient.patientID = "+req.params.patientID;
+  
+
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result);
+    res.status(200).json(result);
+    
+    
+  });  
+});
+
+
+
+
 
 app.listen("3001", () => {
     console.log("Server started at port 3001");
